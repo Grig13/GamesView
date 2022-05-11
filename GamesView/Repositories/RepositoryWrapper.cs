@@ -35,7 +35,31 @@ namespace GamesView.Repositories
             }
         }
 
-       
+        public INewsRepository NewsRepository
+        {
+            get
+            {
+                if (_newsRepository == null)
+                {
+                    _newsRepository = new NewsRepository(_dbContext);
+                }
+                return _newsRepository;
+            }
+        }
+
+        public IReviewRepository ReviewRepository
+        {
+            get
+            {
+                if (_reviewRepository == null)
+                {
+                    _reviewRepository = new ReviewRepository(_dbContext);
+                }
+                return _reviewRepository;
+            }
+        }
+
+
 
         public RepositoryWrapper(GamesViewDbContext dbContext)
         {

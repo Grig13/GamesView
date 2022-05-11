@@ -7,36 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GamesView.Data;
 using GamesView.Models;
+using GamesView.Services.Interfaces;
 
 namespace GamesView.Controllers
 {
     public class NewsController : Controller
     {
-        private readonly GamesViewDbContext _context;
+        private readonly INewsService _newsService;
 
-        public NewsController(GamesViewDbContext context)
+        public NewsController(INewsService newsService)
         {
-            _context = context;
+            _newsService = newsService;
         }
 
         // GET: News
         public async Task<IActionResult> Index()
         {
-              return _context.Newss != null ? 
-                          View(await _context.Newss.ToListAsync()) :
-                          Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
+            var news = _newsService.GetUsers();
+            return View(news);
         }
 
         // GET: News/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
+            var news = _newsService.GetUsers().FirstOrDefault(m => m.NewsId == id);
             if (news == null)
             {
                 return NotFound();
@@ -60,8 +59,8 @@ namespace GamesView.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(news);
-                await _context.SaveChangesAsync();
+                _newsService.AddUser(news);
+                _newsService.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(news);
@@ -70,12 +69,12 @@ namespace GamesView.Controllers
         // GET: News/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss.FindAsync(id);
+            var news = _newsService.GetUsers().FirstOrDefault(m => m.NewsId == id);
             if (news == null)
             {
                 return NotFound();
@@ -99,8 +98,8 @@ namespace GamesView.Controllers
             {
                 try
                 {
-                    _context.Update(news);
-                    await _context.SaveChangesAsync();
+                    _newsService.UpdateUser(news);
+                    _newsService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -121,13 +120,12 @@ namespace GamesView.Controllers
         // GET: News/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
+            var news = _newsService.GetUsers().FirstOrDefault(m => m.NewsId == id);
             if (news == null)
             {
                 return NotFound();
@@ -141,23 +139,15 @@ namespace GamesView.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Newss == null)
-            {
-                return Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
-            }
-            var news = await _context.Newss.FindAsync(id);
-            if (news != null)
-            {
-                _context.Newss.Remove(news);
-            }
-            
-            await _context.SaveChangesAsync();
+            var news = _newsService.GetUsersByCondition(b => b.NewsId == id).FirstOrDefault();
+            _newsService.DeleteUser(news);
+            _newsService.Save();
             return RedirectToAction(nameof(Index));
         }
 
         private bool NewsExists(int id)
         {
-          return (_context.Newss?.Any(e => e.NewsId == id)).GetValueOrDefault();
+            return _newsService.GetUsers().Any(e => e.NewsId == id);
         }
     }
 }

@@ -7,36 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GamesView.Data;
 using GamesView.Models;
+using GamesView.Services.Interfaces;
 
 namespace GamesView.Controllers
 {
     public class ReviewsController : Controller
     {
-        private readonly GamesViewDbContext _context;
+        private readonly IReviewService _reviewService;
 
-        public ReviewsController(GamesViewDbContext context)
+        public ReviewsController(IReviewService reviewService)
         {
-            _context = context;
+            _reviewService = reviewService;
         }
 
         // GET: Reviews
         public async Task<IActionResult> Index()
         {
-              return _context.Reviews != null ? 
-                          View(await _context.Reviews.ToListAsync()) :
-                          Problem("Entity set 'GamesViewDbContext.Reviews'  is null.");
+            var review = _reviewService.GetUsers();
+            return View(review);
         }
 
         // GET: Reviews/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Reviews == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var review = await _context.Reviews
-                .FirstOrDefaultAsync(m => m.ReviewId == id);
+            var review = _reviewService.GetUsers().FirstOrDefault(m => m.ReviewId == id);
             if (review == null)
             {
                 return NotFound();
@@ -60,8 +59,8 @@ namespace GamesView.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(review);
-                await _context.SaveChangesAsync();
+                _reviewService.AddUser(review);
+                _reviewService.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(review);
@@ -70,12 +69,12 @@ namespace GamesView.Controllers
         // GET: Reviews/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Reviews == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var review = await _context.Reviews.FindAsync(id);
+            var review = _reviewService.GetUsers().FirstOrDefault(m => m.ReviewId == id);
             if (review == null)
             {
                 return NotFound();
@@ -99,8 +98,8 @@ namespace GamesView.Controllers
             {
                 try
                 {
-                    _context.Update(review);
-                    await _context.SaveChangesAsync();
+                    _reviewService.UpdateUser(review);
+                    _reviewService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -121,13 +120,12 @@ namespace GamesView.Controllers
         // GET: Reviews/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Reviews == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var review = await _context.Reviews
-                .FirstOrDefaultAsync(m => m.ReviewId == id);
+            var review = _reviewService.GetUsers().FirstOrDefault(m => m.ReviewId == id);
             if (review == null)
             {
                 return NotFound();
@@ -141,23 +139,15 @@ namespace GamesView.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Reviews == null)
-            {
-                return Problem("Entity set 'GamesViewDbContext.Reviews'  is null.");
-            }
-            var review = await _context.Reviews.FindAsync(id);
-            if (review != null)
-            {
-                _context.Reviews.Remove(review);
-            }
-            
-            await _context.SaveChangesAsync();
+            var review = _reviewService.GetUsersByCondition(b => b.ReviewId == id).FirstOrDefault();
+            _reviewService.DeleteUser(review);
+            _reviewService.Save();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ReviewExists(int id)
         {
-          return (_context.Reviews?.Any(e => e.ReviewId == id)).GetValueOrDefault();
+            return _reviewService.GetUsers().Any(e => e.ReviewId == id);
         }
     }
 }

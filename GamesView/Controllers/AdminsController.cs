@@ -7,36 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GamesView.Data;
 using GamesView.Models;
+using GamesView.Services.Interfaces;
 
 namespace GamesView.Controllers
 {
     public class AdminsController : Controller
     {
-        private readonly GamesViewDbContext _context;
+        private readonly IAdminService _adminService;
 
-        public AdminsController(GamesViewDbContext context)
+        public AdminsController(IAdminService adminService)
         {
-            _context = context;
+            _adminService = adminService;
         }
 
         // GET: Admins
         public async Task<IActionResult> Index()
         {
-              return _context.Admins != null ? 
-                          View(await _context.Admins.ToListAsync()) :
-                          Problem("Entity set 'GamesViewDbContext.Admins'  is null.");
+            var admins = _adminService.GetUsers();
+            return View(admins);
         }
 
         // GET: Admins/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Admins == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var admin = await _context.Admins
-                .FirstOrDefaultAsync(m => m.AdminId == id);
+            var admin = _adminService.GetUsers().FirstOrDefault(m => m.AdminId == id);
             if (admin == null)
             {
                 return NotFound();
@@ -60,8 +59,8 @@ namespace GamesView.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(admin);
-                await _context.SaveChangesAsync();
+                _adminService.AddUser(admin);
+                _adminService.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(admin);
@@ -70,12 +69,12 @@ namespace GamesView.Controllers
         // GET: Admins/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Admins == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var admin = await _context.Admins.FindAsync(id);
+            var admin = _adminService.GetUsers().FirstOrDefault(m => m.AdminId == id);
             if (admin == null)
             {
                 return NotFound();
@@ -99,8 +98,8 @@ namespace GamesView.Controllers
             {
                 try
                 {
-                    _context.Update(admin);
-                    await _context.SaveChangesAsync();
+                    _adminService.UpdateUser(admin);
+                    _adminService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -121,13 +120,12 @@ namespace GamesView.Controllers
         // GET: Admins/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Admins == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var admin = await _context.Admins
-                .FirstOrDefaultAsync(m => m.AdminId == id);
+            var admin = _adminService.GetUsers().FirstOrDefault(m => m.AdminId == id);
             if (admin == null)
             {
                 return NotFound();
@@ -141,23 +139,15 @@ namespace GamesView.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            if (_context.Admins == null)
-            {
-                return Problem("Entity set 'GamesViewDbContext.Admins'  is null.");
-            }
-            var admin = await _context.Admins.FindAsync(id);
-            if (admin != null)
-            {
-                _context.Admins.Remove(admin);
-            }
-            
-            await _context.SaveChangesAsync();
+            var user = _adminService.GetUsersByCondition(b => b.AdminId == id).FirstOrDefault();
+            _adminService.DeleteUser(user);
+            _adminService.Save();
             return RedirectToAction(nameof(Index));
         }
 
         private bool AdminExists(int? id)
         {
-          return (_context.Admins?.Any(e => e.AdminId == id)).GetValueOrDefault();
+            return _adminService.GetUsers().Any(e => e.AdminId == id);
         }
     }
 }
