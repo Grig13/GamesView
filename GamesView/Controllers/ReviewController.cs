@@ -26,7 +26,7 @@ namespace GamesView.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateNews(Review reviews)
+        public IActionResult CreateReview(Review reviews)
         {
             _reviewRepository.Create(reviews);
             return RedirectToAction("Index");

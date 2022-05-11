@@ -9,9 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<GamesViewDbContext>(options => options.UseSqlServer(
-    builder.Configuration.GetConnectionString("DefaultConnection")
+    builder.Configuration.GetConnectionString("LaptopConnection")
     ));
+
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
