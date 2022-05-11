@@ -8,7 +8,7 @@ namespace GamesView.Repositories
     {
         public UserRepository(GamesViewDbContext dbContext) : base(dbContext)
         {
-
+            
         }
     }
 }

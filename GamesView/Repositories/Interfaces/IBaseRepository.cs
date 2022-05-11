@@ -5,9 +5,10 @@ namespace GamesView.Repositories.Interfaces
 {
     public interface IBaseRepository<T>
     {
-        ICollection<T> GetAll();
-        T Create(T entity);
+        IQueryable<T> FindAll();
+        IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression);
+        void Create(T entity);
+        void Update(T entity);
         void Delete(T entity);
-        T Update(T entity);
     }
 }

@@ -10,87 +10,87 @@ using GamesView.Models;
 
 namespace GamesView.Controllers
 {
-    public class NewsController : Controller
+    public class ReviewsController : Controller
     {
         private readonly GamesViewDbContext _context;
 
-        public NewsController(GamesViewDbContext context)
+        public ReviewsController(GamesViewDbContext context)
         {
             _context = context;
         }
 
-        // GET: News
+        // GET: Reviews
         public async Task<IActionResult> Index()
         {
-              return _context.Newss != null ? 
-                          View(await _context.Newss.ToListAsync()) :
-                          Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
+              return _context.Reviews != null ? 
+                          View(await _context.Reviews.ToListAsync()) :
+                          Problem("Entity set 'GamesViewDbContext.Reviews'  is null.");
         }
 
-        // GET: News/Details/5
+        // GET: Reviews/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null || _context.Reviews == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
-            if (news == null)
+            var review = await _context.Reviews
+                .FirstOrDefaultAsync(m => m.ReviewId == id);
+            if (review == null)
             {
                 return NotFound();
             }
 
-            return View(news);
+            return View(review);
         }
 
-        // GET: News/Create
+        // GET: Reviews/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: News/Create
+        // POST: Reviews/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NewsId,Name,Link")] News news)
+        public async Task<IActionResult> Create([Bind("ReviewId,ReviewText,GameDescription,UserId,ScoreValue,GameName")] Review review)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(news);
+                _context.Add(review);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            return View(review);
         }
 
-        // GET: News/Edit/5
+        // GET: Reviews/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null || _context.Reviews == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss.FindAsync(id);
-            if (news == null)
+            var review = await _context.Reviews.FindAsync(id);
+            if (review == null)
             {
                 return NotFound();
             }
-            return View(news);
+            return View(review);
         }
 
-        // POST: News/Edit/5
+        // POST: Reviews/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NewsId,Name,Link")] News news)
+        public async Task<IActionResult> Edit(int id, [Bind("ReviewId,ReviewText,GameDescription,UserId,ScoreValue,GameName")] Review review)
         {
-            if (id != news.NewsId)
+            if (id != review.ReviewId)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace GamesView.Controllers
             {
                 try
                 {
-                    _context.Update(news);
+                    _context.Update(review);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NewsExists(news.NewsId))
+                    if (!ReviewExists(review.ReviewId))
                     {
                         return NotFound();
                     }
@@ -115,49 +115,49 @@ namespace GamesView.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            return View(review);
         }
 
-        // GET: News/Delete/5
+        // GET: Reviews/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null || _context.Reviews == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
-            if (news == null)
+            var review = await _context.Reviews
+                .FirstOrDefaultAsync(m => m.ReviewId == id);
+            if (review == null)
             {
                 return NotFound();
             }
 
-            return View(news);
+            return View(review);
         }
 
-        // POST: News/Delete/5
+        // POST: Reviews/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Newss == null)
+            if (_context.Reviews == null)
             {
-                return Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
+                return Problem("Entity set 'GamesViewDbContext.Reviews'  is null.");
             }
-            var news = await _context.Newss.FindAsync(id);
-            if (news != null)
+            var review = await _context.Reviews.FindAsync(id);
+            if (review != null)
             {
-                _context.Newss.Remove(news);
+                _context.Reviews.Remove(review);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool NewsExists(int id)
+        private bool ReviewExists(int id)
         {
-          return (_context.Newss?.Any(e => e.NewsId == id)).GetValueOrDefault();
+          return (_context.Reviews?.Any(e => e.ReviewId == id)).GetValueOrDefault();
         }
     }
 }

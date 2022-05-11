@@ -7,90 +7,89 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GamesView.Data;
 using GamesView.Models;
+using GamesView.Services.Interfaces;
 
 namespace GamesView.Controllers
 {
-    public class NewsController : Controller
+    public class UsersController : Controller
     {
-        private readonly GamesViewDbContext _context;
+        private readonly IUserService _userService;
 
-        public NewsController(GamesViewDbContext context)
+        public UsersController(IUserService userService)
         {
-            _context = context;
+           this._userService = userService;
         }
 
-        // GET: News
+        // GET: Users
         public async Task<IActionResult> Index()
         {
-              return _context.Newss != null ? 
-                          View(await _context.Newss.ToListAsync()) :
-                          Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
+            var users = _userService.GetUsers();
+            return View(users);
         }
 
-        // GET: News/Details/5
+        // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
-            if (news == null)
+            var user = _userService.GetUsers().FirstOrDefault(m => m.UserID == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(news);
+            return View(user);
         }
 
-        // GET: News/Create
+        // GET: Users/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: News/Create
+        // POST: Users/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NewsId,Name,Link")] News news)
+        public async Task<IActionResult> Create([Bind("UserID,Username,Password")] User user)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(news);
-                await _context.SaveChangesAsync();
+                _userService.AddUser(user);
+                _userService.Save();
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            return View(user);
         }
 
-        // GET: News/Edit/5
+        // GET: Users/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss.FindAsync(id);
-            if (news == null)
+            var user = _userService.GetUsers().FirstOrDefault(m => m.UserID == id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(news);
+            return View(user);
         }
 
-        // POST: News/Edit/5
+        // POST: Users/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NewsId,Name,Link")] News news)
+        public async Task<IActionResult> Edit(int id, [Bind("UserID,Username,Password")] User user)
         {
-            if (id != news.NewsId)
+            if (id != user.UserID)
             {
                 return NotFound();
             }
@@ -99,12 +98,12 @@ namespace GamesView.Controllers
             {
                 try
                 {
-                    _context.Update(news);
-                    await _context.SaveChangesAsync();
+                    _userService.UpdateUser(user);
+                    _userService.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NewsExists(news.NewsId))
+                    if (!UserExists(user.UserID))
                     {
                         return NotFound();
                     }
@@ -115,49 +114,39 @@ namespace GamesView.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            return View(user);
         }
 
-        // GET: News/Delete/5
+        // GET: Users/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
-            if (news == null)
+            var user = _userService.GetUsers().FirstOrDefault(m => m.UserID == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(news);
+            return View(user);
         }
 
-        // POST: News/Delete/5
+        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Newss == null)
-            {
-                return Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
-            }
-            var news = await _context.Newss.FindAsync(id);
-            if (news != null)
-            {
-                _context.Newss.Remove(news);
-            }
-            
-            await _context.SaveChangesAsync();
+            var user = _userService.GetUsersByCondition(b => b.UserID == id).FirstOrDefault();
+            _userService.DeleteUser(user);
+            _userService.Save();
             return RedirectToAction(nameof(Index));
         }
-
-        private bool NewsExists(int id)
+        private bool UserExists(int id)
         {
-          return (_context.Newss?.Any(e => e.NewsId == id)).GetValueOrDefault();
+            return _userService.GetUsers().Any(e => e.UserID == id);
         }
     }
 }

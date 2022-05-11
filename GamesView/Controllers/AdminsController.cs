@@ -10,87 +10,87 @@ using GamesView.Models;
 
 namespace GamesView.Controllers
 {
-    public class NewsController : Controller
+    public class AdminsController : Controller
     {
         private readonly GamesViewDbContext _context;
 
-        public NewsController(GamesViewDbContext context)
+        public AdminsController(GamesViewDbContext context)
         {
             _context = context;
         }
 
-        // GET: News
+        // GET: Admins
         public async Task<IActionResult> Index()
         {
-              return _context.Newss != null ? 
-                          View(await _context.Newss.ToListAsync()) :
-                          Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
+              return _context.Admins != null ? 
+                          View(await _context.Admins.ToListAsync()) :
+                          Problem("Entity set 'GamesViewDbContext.Admins'  is null.");
         }
 
-        // GET: News/Details/5
+        // GET: Admins/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null || _context.Admins == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
-            if (news == null)
+            var admin = await _context.Admins
+                .FirstOrDefaultAsync(m => m.AdminId == id);
+            if (admin == null)
             {
                 return NotFound();
             }
 
-            return View(news);
+            return View(admin);
         }
 
-        // GET: News/Create
+        // GET: Admins/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: News/Create
+        // POST: Admins/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NewsId,Name,Link")] News news)
+        public async Task<IActionResult> Create([Bind("AdminId,Username,Password")] Admin admin)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(news);
+                _context.Add(admin);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            return View(admin);
         }
 
-        // GET: News/Edit/5
+        // GET: Admins/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null || _context.Admins == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss.FindAsync(id);
-            if (news == null)
+            var admin = await _context.Admins.FindAsync(id);
+            if (admin == null)
             {
                 return NotFound();
             }
-            return View(news);
+            return View(admin);
         }
 
-        // POST: News/Edit/5
+        // POST: Admins/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NewsId,Name,Link")] News news)
+        public async Task<IActionResult> Edit(int? id, [Bind("AdminId,Username,Password")] Admin admin)
         {
-            if (id != news.NewsId)
+            if (id != admin.AdminId)
             {
                 return NotFound();
             }
@@ -99,12 +99,12 @@ namespace GamesView.Controllers
             {
                 try
                 {
-                    _context.Update(news);
+                    _context.Update(admin);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!NewsExists(news.NewsId))
+                    if (!AdminExists(admin.AdminId))
                     {
                         return NotFound();
                     }
@@ -115,49 +115,49 @@ namespace GamesView.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(news);
+            return View(admin);
         }
 
-        // GET: News/Delete/5
+        // GET: Admins/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Newss == null)
+            if (id == null || _context.Admins == null)
             {
                 return NotFound();
             }
 
-            var news = await _context.Newss
-                .FirstOrDefaultAsync(m => m.NewsId == id);
-            if (news == null)
+            var admin = await _context.Admins
+                .FirstOrDefaultAsync(m => m.AdminId == id);
+            if (admin == null)
             {
                 return NotFound();
             }
 
-            return View(news);
+            return View(admin);
         }
 
-        // POST: News/Delete/5
+        // POST: Admins/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int? id)
         {
-            if (_context.Newss == null)
+            if (_context.Admins == null)
             {
-                return Problem("Entity set 'GamesViewDbContext.Newss'  is null.");
+                return Problem("Entity set 'GamesViewDbContext.Admins'  is null.");
             }
-            var news = await _context.Newss.FindAsync(id);
-            if (news != null)
+            var admin = await _context.Admins.FindAsync(id);
+            if (admin != null)
             {
-                _context.Newss.Remove(news);
+                _context.Admins.Remove(admin);
             }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool NewsExists(int id)
+        private bool AdminExists(int? id)
         {
-          return (_context.Newss?.Any(e => e.NewsId == id)).GetValueOrDefault();
+          return (_context.Admins?.Any(e => e.AdminId == id)).GetValueOrDefault();
         }
     }
 }

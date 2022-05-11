@@ -8,35 +8,36 @@ namespace GamesView.Repositories
 {
     public abstract class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        protected readonly GamesViewDbContext _dbContext;
+        protected GamesViewDbContext dbContext { get; set; }
 
         public BaseRepository(GamesViewDbContext dbContext)
         {
-            this._dbContext = dbContext;
+            this.dbContext = dbContext;
         }
 
-        public T Create(T entity)
+        public IQueryable<T> FindAll()
         {
-            var returnEntity = _dbContext.Set<T>().Add(entity).Entity;
-            _dbContext.SaveChanges();
-            return returnEntity;
+            return this.dbContext.Set<T>().AsNoTracking();
         }
 
-        public T Update(T entity)
+        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
         {
-            var itemUpdate = _dbContext.Set<T>().Update(entity).Entity;
-            _dbContext.SaveChanges();
-            return itemUpdate;
+            return this.dbContext.Set<T>().Where(expression).AsNoTracking();
+        }
+
+        public void Create(T entity)
+        {
+            this.dbContext.Set<T>().Add(entity);
+        }
+
+        public void Update(T entity)
+        {
+            this.dbContext.Set<T>().Update(entity);
         }
 
         public void Delete(T entity)
         {
-            this._dbContext.Set<T>().Remove(entity);
-        }
-
-        public ICollection<T> GetAll()
-        {
-            return _dbContext.Set<T>().ToList();
+            this.dbContext.Set<T>().Remove(entity);
         }
     }
 }

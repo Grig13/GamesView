@@ -1,33 +1,41 @@
-﻿@model IEnumerable<News>
+﻿@model IEnumerable<GamesView.Models.News>
+
 @{
-    ViewData["Title"] = "News Page";
+    ViewData["Title"] = "Index";
 }
 
-<a  class="btn btn-primary btn-lg mt-3 mb-3" asp-controller="News" asp-action="CreateNews"> <i class="bi bi-plus-circle-dotted"></i> &nbsp; Add new News</a>
+<h1>Index</h1>
 
-
-<table class="table table-hover">
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
     <thead>
-        <th scope="col">NewsId</th>
-        <th scope="col">Name</th>
-        <th scope="col">Link</th>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Link)
+            </th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
-        @foreach(var obj in Model)
-        {
-            <tr class="table-active">
-                <td>@obj.NewsId</td>
-                <td>@obj.Name</td>
-                <td>@obj.Link</td>
-                <td>
-                    <div class="w-75 btn-group" role="group">
-                        <a asp-controller="Games" asp-action="Edit" asp-route-id="@obj.NewsId" class="btn btn-primary mx-2"> 
-                            <i class="bi bi-pencil-fill"> </i> &nbsp; Edit</a>
-                        <a asp-controller="Games" asp-action="Delete" asp-route-id="@obj.NewsId" class="btn btn-danger mx-2"> 
-                            <i class="bi bi-trash-fill"></i> &nbsp; Delete</a>
-                    </div>
-                </td>
-            </tr>
-        }
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Link)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.NewsId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.NewsId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.NewsId">Delete</a>
+            </td>
+        </tr>
+}
     </tbody>
 </table>
