@@ -13,7 +13,6 @@ namespace GamesView.Models
         [StringLength(150)]
         public string? GameDescription { get; set; }
 
-        public int UserId { get; set; }
         public int ScoreValue { get; set; }
         public string? GameName { get; set; }
 

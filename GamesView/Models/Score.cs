@@ -10,7 +10,6 @@ namespace GamesView.Models
         public int ScoreValue { get; set; }
 
         public int GameId { get; set; }
-        public int UserId { get; set; }
         public string? GameName { get; set; }
     }
 }
